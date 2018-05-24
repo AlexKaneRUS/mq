@@ -13,8 +13,9 @@ module System.MQ.Error.Internal.Types
   , errorIncorrectInput
   ) where
 
-import           GHC.Generics (Generic)
-import           Text.Printf  (printf)
+import           Control.Exception (Exception)
+import           GHC.Generics      (Generic)
+import           Text.Printf       (printf)
 
 -- | MQError represents:
 --   * data for the message with type @error@: for more details see file System.MQ.Error.Internal.Instances;
@@ -28,6 +29,7 @@ data MQError = MQError { errorCode    :: Int
 instance Show MQError where
   show (MQError c m) = printf "MQError (code %d): %s" c m
 
+instance Exception MQError
 
 --------------------------------------------------------------------------------
 -- PROTOCOL ERROR: 1xx

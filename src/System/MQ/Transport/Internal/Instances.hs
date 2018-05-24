@@ -6,8 +6,7 @@
 
 module System.MQ.Transport.Internal.Instances () where
 
-import           Control.Monad.IO.Class             (liftIO)
-import           System.MQ.Monad                    (MQMonad)
+import           Control.Monad.IO.Class             (MonadIO, liftIO)
 import           System.MQ.Transport.Internal.Types
 import           System.ZMQ4                        (Pub (..), Pull (..),
                                                      Push (..), Socket,
@@ -51,18 +50,18 @@ instance BindTo SubChannel where
 -- | Creates 'Socket' and for given 'Context', 'SocketType', 'Host' and 'Port'.
 -- This type of sockets is used when destination address is unknown.
 --
-createAndBind :: SocketType a => Context -> a -> Host -> Port -> MQMonad (Socket a)
+createAndBind :: (MonadIO m, SocketType a) => Context -> a -> Host -> Port -> m (Socket a)
 createAndBind = createAndAction bind
 
 -- | Creates 'Socket' and for given 'Context', 'SocketType', 'Host' and 'Port'.
 -- This type of sockets is used when destination address is known.
 --
-createAndConnect :: SocketType a => Context -> a -> Host -> Port -> MQMonad (Socket a)
+createAndConnect :: (MonadIO m, SocketType a) => Context -> a -> Host -> Port -> m (Socket a)
 createAndConnect = createAndAction connect
 
 -- | Inner function which 'connect's or 'bind's to Socket.
 --
-createAndAction :: SocketType a => (Socket a -> String -> IO ()) -> Context -> a -> Host -> Port -> MQMonad (Socket a)
+createAndAction :: (MonadIO m, SocketType a) => (Socket a -> String -> IO ()) -> Context -> a -> Host -> Port -> m (Socket a)
 createAndAction action context' socketType host port  = do
     socket' <- liftIO $ socket context' socketType
     liftIO $ action socket' (showTCP host port)
