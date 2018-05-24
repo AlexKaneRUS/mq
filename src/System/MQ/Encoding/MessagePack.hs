@@ -11,8 +11,8 @@ import           Control.Monad.Except (throwError)
 import qualified Data.ByteString      as BS (ByteString)
 import qualified Data.ByteString.Lazy as BSL (fromStrict, toStrict)
 import qualified Data.MessagePack     as MP (MessagePack (..), pack, unpack)
-import           System.MQ.Monad      (MQMonad)
 import           System.MQ.Error      (MQError (..), errorEncoding)
+import           System.MQ.Monad      (MQMonadS)
 import           Text.Printf          (printf)
 
 -- | Packs something from 'MP.MessagePack' to 'BS.ByteString'.
@@ -29,7 +29,7 @@ unpack = MP.unpack . BSL.fromStrict
 -- | Unpacks something from 'BS.ByteString' to 'MP.MessagePack' inside 'MQMonad'.
 -- If 'unpackM' failes then 'MQError' will be thrown.
 --
-unpackM :: MP.MessagePack a => BS.ByteString -> MQMonad a
+unpackM :: MP.MessagePack a => BS.ByteString -> MQMonadS s a
 unpackM bs@(unpack -> m) = maybe (throwError err) pure m
   where
     err = MQError errorEncoding . printf "could not unpack MessagePack: %s" . show $ bs

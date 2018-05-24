@@ -17,7 +17,7 @@ import           Control.Exception              (throw)
 import           Control.Monad.Except           (ExceptT, MonadError, MonadIO,
                                                  catchError, forever, liftIO,
                                                  runExceptT)
-import           Control.Monad.State            (MonadState, StateT, runStateT)
+import           Control.Monad.State.Strict     (MonadState, StateT, runStateT)
 import           System.Log.Logger              (errorM)
 import           System.MQ.Error.Internal.Types (MQError (..))
 import           Text.Printf                    (printf)

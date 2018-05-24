@@ -26,7 +26,7 @@ import           Data.String                       (IsString (..))
 import           System.Clock                      (Clock (..), getTime,
                                                     toNanoSecs)
 import           System.MQ.Error.Internal.Types    (MQError (..), errorEncoding)
-import           System.MQ.Monad                   (MQMonad)
+import           System.MQ.Monad                   (MQMonadS)
 import           System.MQ.Protocol.Class          (MessageLike (..),
                                                     Props (..))
 import           System.MQ.Protocol.Internal.Types (Creator, Encoding, Hash,
@@ -55,26 +55,26 @@ msgpackEncoding = "MessagePack"
 
 -- | Creates new message.
 --
-createMessage :: forall a. MessageLike a
+createMessage :: forall a s. MessageLike a
               => Hash      -- ^ parent message id
               -> Creator   -- ^ message creator id
               -> Timestamp -- ^ message expiration time
               -> a         -- ^ message data
-              -> MQMonad Message
+              -> MQMonadS s Message
 createMessage mPid mCreator mExpires (pack -> mData) = do
     let Props{..}   = props :: Props a
     createMessageBS mPid mCreator mExpires spec encoding mtype mData
 
 -- | Creates new message using already encoded data.
 --
-createMessageBS :: Hash          -- ^ parent message id
-                -> Creator       -- ^ message creator id
-                -> Timestamp     -- ^ message expiration time
-                -> Spec          -- ^ spec of message
-                -> Encoding      -- ^ encoding of data
-                -> MessageType   -- ^ type of data
-                -> BS.ByteString -- ^ message data
-                -> MQMonad Message
+createMessageBS :: forall s. Hash -- ^ parent message id
+                -> Creator        -- ^ message creator id
+                -> Timestamp      -- ^ message expiration time
+                -> Spec           -- ^ spec of message
+                -> Encoding       -- ^ encoding of data
+                -> MessageType    -- ^ type of data
+                -> BS.ByteString  -- ^ message data
+                -> MQMonadS s Message
 createMessageBS mPid mCreator mExpires spec' encoding' mtype' mData = do
     when (encoding' /= jsonEncoding && encoding' /= msgpackEncoding) $ throwError encodingEr
     (mId, mCreated) <- mkId mCreator spec'
