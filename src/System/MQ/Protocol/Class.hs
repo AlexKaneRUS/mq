@@ -1,5 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module System.MQ.Protocol.Class
   (
@@ -47,7 +46,7 @@ class MessageLike a where
   -- | Unpacks something from 'BS.ByteString' inside 'MQMonad'.
   -- If 'unpackM' failes then 'MQError' will be thrown.
   --
-  unpackM :: forall s. BS.ByteString -> MQMonadS s a
+  unpackM :: BS.ByteString -> MQMonadS s a
   unpackM bs@(unpack -> m) = maybe (throwError err) pure m
     where
       err = MQError errorEncoding . printf "could not unpack sessage: %s" . show $ bs

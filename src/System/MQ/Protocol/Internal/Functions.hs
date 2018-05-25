@@ -67,13 +67,13 @@ createMessage mPid mCreator mExpires (pack -> mData) = do
 
 -- | Creates new message using already encoded data.
 --
-createMessageBS :: forall s. Hash -- ^ parent message id
-                -> Creator        -- ^ message creator id
-                -> Timestamp      -- ^ message expiration time
-                -> Spec           -- ^ spec of message
-                -> Encoding       -- ^ encoding of data
-                -> MessageType    -- ^ type of data
-                -> BS.ByteString  -- ^ message data
+createMessageBS :: Hash          -- ^ parent message id
+                -> Creator       -- ^ message creator id
+                -> Timestamp     -- ^ message expiration time
+                -> Spec          -- ^ spec of message
+                -> Encoding      -- ^ encoding of data
+                -> MessageType   -- ^ type of data
+                -> BS.ByteString -- ^ message data
                 -> MQMonadS s Message
 createMessageBS mPid mCreator mExpires spec' encoding' mtype' mData = do
     when (encoding' /= jsonEncoding && encoding' /= msgpackEncoding) $ throwError encodingEr

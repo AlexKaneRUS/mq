@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RankNTypes #-}
 
 module System.MQ.Transport.ByteString
   (
@@ -14,8 +13,9 @@ import qualified Data.ByteString                    as BS (ByteString, split)
 import           Data.List.NonEmpty                 (NonEmpty (..))
 import           Data.Maybe                         (fromJust, isJust)
 import qualified System.MQ.Encoding.MessagePack     as MP (unpack)
+import           System.MQ.Error                    (MQError (..), errorTag,
+                                                     errorTransport)
 import           System.MQ.Monad                    (MQMonadS)
-import           System.MQ.Error                    (MQError (..), errorTag, errorTransport)
 import           System.MQ.Protocol                 (delimiter)
 import           System.MQ.Transport.Internal.Types (PubChannel, PullChannel,
                                                      PushChannel, SubChannel)
@@ -24,24 +24,24 @@ import           Text.Printf                        (printf)
 
 -- | Pushes @(tag, content)@ to the 'PushChannel'.
 --
-push :: forall s. PushChannel -> (BS.ByteString, BS.ByteString) -> MQMonadS s ()
+push :: PushChannel -> (BS.ByteString, BS.ByteString) -> MQMonadS s ()
 push channel (msgTag, msgContent) = liftIO . sendMulti channel $ msgTag :| [msgContent]
 
 -- | Pulls @(tag, content)@ from the 'PullChannel'.
 --
-pull :: forall s. PullChannel -> MQMonadS s (BS.ByteString, BS.ByteString)
+pull :: PullChannel -> MQMonadS s (BS.ByteString, BS.ByteString)
 pull channel = do
     msg' <- liftIO . receiveMulti $ channel
     processMessage msg'
 
 -- | Publishes @(tag, content)@ to the 'PubChannel'.
 --
-pub :: forall s. PubChannel -> (BS.ByteString, BS.ByteString) -> MQMonadS s ()
+pub :: PubChannel -> (BS.ByteString, BS.ByteString) -> MQMonadS s ()
 pub channel (msgTag, msgContent) = liftIO . sendMulti channel $ msgTag :| [msgContent]
 
 -- | Subscribes and gets @(tag, content)@ from the 'SubChannel'.
 --
-sub :: forall s. SubChannel -> MQMonadS s (BS.ByteString, BS.ByteString)
+sub :: SubChannel -> MQMonadS s (BS.ByteString, BS.ByteString)
 sub channel = do
     msg' <- liftIO . receiveMulti $ channel
     processMessage msg'

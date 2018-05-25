@@ -18,8 +18,8 @@ module System.MQ.Transport.Internal.Types
   , terminateM
   ) where
 
-import           Control.Monad.IO.Class (liftIO, MonadIO)
-import           System.MQ.Monad        (MQMonad)
+import           Control.Monad.IO.Class (MonadIO, liftIO)
+import           System.MQ.Monad        (MQMonadS)
 import           System.ZMQ4            (Context, Pub, Pull, Push, Socket, Sub,
                                          close, context, term)
 import           Text.Printf            (printf)
@@ -84,10 +84,10 @@ showTCP = printf "tcp://%s:%d"
 contextM :: MonadIO m => m Context
 contextM = liftIO context
 
-closeM :: Socket a -> MQMonad ()
+closeM :: Socket a -> MQMonadS s ()
 closeM = liftIO . close
 
 -- | Terminates given context in 'MQMonad'.
 --
-terminateM :: Context -> MQMonad ()
+terminateM :: Context -> MQMonadS s ()
 terminateM = liftIO . term
